@@ -147,7 +147,12 @@ class Blockchain {
     getBlockByHash(hash) {
         let self = this;
         return new Promise((resolve, reject) => {
-           
+           let blocks = self.chain.filter(block => block.hash === hash);
+           if (blocks && blocks.length > 0) {
+               resolve(blocks[0]);
+           } else {
+               resolve(null);
+           }
         });
     }
 
