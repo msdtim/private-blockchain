@@ -64,7 +64,19 @@ class Blockchain {
     _addBlock(block) {
         let self = this;
         return new Promise(async (resolve, reject) => {
-           
+            block.height = self.chain.length;
+            block.time = new Date().getTime().toString().slice(0,-3);
+            if (block.height != 0) {
+                let latestBlock = self.chain[self.chain.length - 1];
+                block.previousBlockHash = latestBlock.hash
+            }
+            block.hash = SHA256(JSON.stringify(block)).toString();
+            if (block.hash) {
+                self.chain.push(block)
+                resolve(block)
+            } else {
+                reject(Error("Failed to add block"))
+            }
         });
     }
 
@@ -78,7 +90,7 @@ class Blockchain {
      */
     requestMessageOwnershipVerification(address) {
         return new Promise((resolve) => {
-            
+            resolve(`${address}:${new Date().getTime().toString().slice(0,-3)}:starRegistry`);
         });
     }
 
@@ -102,7 +114,33 @@ class Blockchain {
     submitStar(address, message, signature, star) {
         let self = this;
         return new Promise(async (resolve, reject) => {
-            
+            let messageTime = parseInt(message.split(':')[1]);
+            let currentTime = parseInt(new Date().getTime().toString().slice(0, -3));
+            if (currentTime - messageTime <= 60*5) {
+                console.log(address);
+                console.log(message);
+                console.log(signature);
+                console.log(star);
+
+                let isVerified = bitcoinMessage.verify(message, address, signature);
+                if (isVerified) {
+                    let newBlock = new BlockClass.Block({owner: address, star: star})
+                    let chainValidated = await this.validateChain();
+                    if (chainValidated) {
+                        let addedBlock = await this._addBlock(newBlock);
+                        resolve(addedBlock)
+                    } else {
+                        console.log("Failed to verify chain");
+                        reject(Error("Failed to verify chain"))
+                    }
+                } else {
+                    console.log("Failed to verify signature");
+                    reject(Error("Failed to verify signature"))
+                }
+            } else {
+                console.log("Submission timeout");
+                reject(Error("Submission timeout"))
+            }
         });
     }
 
@@ -115,7 +153,12 @@ class Blockchain {
     getBlockByHash(hash) {
         let self = this;
         return new Promise((resolve, reject) => {
-           
+           let blocks = self.chain.filter(block => block.hash === hash);
+           if (blocks && blocks.length > 0) {
+               resolve(blocks[0]);
+           } else {
+               resolve(null);
+           }
         });
     }
 
@@ -146,7 +189,15 @@ class Blockchain {
         let self = this;
         let stars = [];
         return new Promise((resolve, reject) => {
-            
+            self.chain.forEach( block => {
+                block.getBData().then(result => {
+                    //console.log(result);
+                    if (result && result.owner === address) {
+                        stars.push(result);
+                    }
+                })
+            });
+            resolve(stars);
         });
     }
 
@@ -160,10 +211,16 @@ class Blockchain {
         let self = this;
         let errorLog = [];
         return new Promise(async (resolve, reject) => {
-            
+            self.chain.forEach(block => {
+                block.validate().then(result => {
+                    if(!result) {
+                        errorLog.push(block.height)
+                    }
+                });
+                resolve(errorLog)
+            });
         });
     }
-
 }
 
 module.exports.Blockchain = Blockchain;   

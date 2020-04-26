@@ -1,0 +1,162 @@
+{
+	"info": {
+		"_postman_id": "7c837798-14af-4e90-8a3f-c0c0f11de3a9",
+		"name": "Private Blockchain Project",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get genesis block",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/block/0",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"block",
+						"0"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get block by hash",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/blockhash/9e510c312bcc392f89ca35295f2f74ab7f800284a9e75e8aea26b67ceb565aab",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"blockhash",
+						"9e510c312bcc392f89ca35295f2f74ab7f800284a9e75e8aea26b67ceb565aab"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get blocks by address",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/blocks/n4XwkCea4UkAmxswpxUC39gBtZSC68EH2r",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"blocks",
+						"n4XwkCea4UkAmxswpxUC39gBtZSC68EH2r"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Request Validation",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"address\": \"2N4P2azMUGfr82wNPusxMFjjtyyRh7DGYse\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/requestValidation",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"requestValidation"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Submit star",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"address\": \"n4XwkCea4UkAmxswpxUC39gBtZSC68EH2r\",\n\t\"signature\": \"H+fX8S4AnUwSXop5XqkMZ7RlBSdd0ScPhGrMUgPW8M2YdbIO3ILbmTWwZFHPxnZzCooK2ABkJzRwANgeSwoLxL4=\",\n\t\"message\": \"n4XwkCea4UkAmxswpxUC39gBtZSC68EH2r:1587903928:starRegistry\",\n\t\"star\": {\n         \"dec\": \"68° 52' 56.9\",\n         \"ra\": \"16h 29m 1.0s\",\n         \"story\": \"Testing the story 1\"\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/submitstar",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"submitstar"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
