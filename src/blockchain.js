@@ -65,13 +65,13 @@ class Blockchain {
         let self = this;
         return new Promise(async (resolve, reject) => {
             block.height = self.chain.length;
-            block.timeStamp = new Date().getTime().toString().slice(0,-3);
+            block.time = new Date().getTime().toString().slice(0,-3);
             if (block.height != 0) {
                 let latestBlock = self.chain[self.chain.length - 1];
                 block.previousBlockHash = latestBlock.hash
             }
             block.hash = SHA256(JSON.stringify(block)).toString();
-            if (!block.hash) {
+            if (block.hash) {
                 self.chain.push(block)
                 resolve(block)
             } else {
@@ -116,16 +116,23 @@ class Blockchain {
         return new Promise(async (resolve, reject) => {
             let messageTime = parseInt(message.split(':')[1]);
             let currentTime = parseInt(new Date().getTime().toString().slice(0, -3));
-            if (currentTime - messageTime <= 60*5) {
+            if (currentTime - messageTime <= 600*5) {
+                console.log(address);
+                console.log(message);
+                console.log(signature);
+                console.log(star);
+
                 let isVerified = bitcoinMessage.verify(message, address, signature);
                 if (isVerified) {
                     let newBlock = new BlockClass.Block({owner: address, star: star})
                     let addedBlock = await this._addBlock(newBlock);
                     resolve(addedBlock)
                 } else {
+                    console.log("Failed to verify signature");
                     reject(Error("Failed to verify signature"))
                 }
             } else {
+                console.log("Submission timeout");
                 reject(Error("Submission timeout"))
             }
         });
