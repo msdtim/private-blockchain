@@ -116,7 +116,7 @@ class Blockchain {
         return new Promise(async (resolve, reject) => {
             let messageTime = parseInt(message.split(':')[1]);
             let currentTime = parseInt(new Date().getTime().toString().slice(0, -3));
-            if (currentTime - messageTime <= 600*5) {
+            if (currentTime - messageTime <= 60*5) {
                 console.log(address);
                 console.log(message);
                 console.log(signature);
@@ -125,8 +125,14 @@ class Blockchain {
                 let isVerified = bitcoinMessage.verify(message, address, signature);
                 if (isVerified) {
                     let newBlock = new BlockClass.Block({owner: address, star: star})
-                    let addedBlock = await this._addBlock(newBlock);
-                    resolve(addedBlock)
+                    let chainValidated = await this.validateChain();
+                    if (chainValidated) {
+                        let addedBlock = await this._addBlock(newBlock);
+                        resolve(addedBlock)
+                    } else {
+                        console.log("Failed to verify chain");
+                        reject(Error("Failed to verify chain"))
+                    }
                 } else {
                     console.log("Failed to verify signature");
                     reject(Error("Failed to verify signature"))
@@ -183,7 +189,15 @@ class Blockchain {
         let self = this;
         let stars = [];
         return new Promise((resolve, reject) => {
-            
+            self.chain.forEach( block => {
+                block.getBData().then(result => {
+                    //console.log(result);
+                    if (result && result.owner === address) {
+                        stars.push(result);
+                    }
+                })
+            });
+            resolve(stars);
         });
     }
 
@@ -197,10 +211,16 @@ class Blockchain {
         let self = this;
         let errorLog = [];
         return new Promise(async (resolve, reject) => {
-            
+            self.chain.forEach(block => {
+                block.validate().then(result => {
+                    if(!result) {
+                        errorLog.push(block.height)
+                    }
+                });
+                resolve(errorLog)
+            });
         });
     }
-
 }
 
 module.exports.Blockchain = Blockchain;   
