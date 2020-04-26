@@ -114,7 +114,20 @@ class Blockchain {
     submitStar(address, message, signature, star) {
         let self = this;
         return new Promise(async (resolve, reject) => {
-            
+            let messageTime = parseInt(message.split(':')[1]);
+            let currentTime = parseInt(new Date().getTime().toString().slice(0, -3));
+            if (currentTime - messageTime <= 60*5) {
+                let isVerified = bitcoinMessage.verify(message, address, signature);
+                if (isVerified) {
+                    let newBlock = new BlockClass.Block({owner: address, star: star})
+                    let addedBlock = await this._addBlock(newBlock);
+                    resolve(addedBlock)
+                } else {
+                    reject(Error("Failed to verify signature"))
+                }
+            } else {
+                reject(Error("Submission timeout"))
+            }
         });
     }
 
