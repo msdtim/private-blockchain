@@ -117,10 +117,6 @@ class Blockchain {
             let messageTime = parseInt(message.split(':')[1]);
             let currentTime = parseInt(new Date().getTime().toString().slice(0, -3));
             if (currentTime - messageTime <= 60*5) {
-                console.log(address);
-                console.log(message);
-                console.log(signature);
-                console.log(star);
 
                 let isVerified = bitcoinMessage.verify(message, address, signature);
                 if (isVerified) {
@@ -211,14 +207,20 @@ class Blockchain {
         let self = this;
         let errorLog = [];
         return new Promise(async (resolve, reject) => {
-            self.chain.forEach(block => {
+            for (var i = 0; i <= self.height; i++) {
+                let block = self.chain[i];
+                if (i === 0 && block.previousBlockHash !== null) {
+                    errorLog.push("Hash validation failed for block" + i);
+                } else if (block.previousBlockHash !== self.chain[i-1].hash){
+                    errorLog.push("Hash validation failed for block" + i);
+                }
                 block.validate().then(result => {
                     if(!result) {
-                        errorLog.push(block.height)
+                        errorLog.push("Block data validation failed for block" + i)
                     }
                 });
-                resolve(errorLog)
-            });
+            }
+            resolve(errorLog);
         });
     }
 }
